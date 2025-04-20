@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta name="description" content="Generate beautiful color palettes from images or manual picks. Export in HEX, RGB, CSS formats. Perfect for designers and developers.">
+  <meta name="keywords" content="color palette, hex colors, rgb, hsl, design tool, image color extractor, color harmony generator">
+  <meta name="author" content="Sardor">
+  <meta property="og:title" content="Color Palette Generator">
+  <meta property="og:description" content="Generate color palettes from images or custom picks. Free, no sign-up, easy, and exportable.">
+  <meta property="og:type" content="website">
+  
+  
+  <link rel="icon" href="4260113.png" type="image/x-icon">
+  <title>Free Online Color Palette Generator – Extract & Create Stunning Color Schemes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+    }
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 { text-align: center; color: #333; }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .upload-section, .color-input {
+      display: flex;
+      gap: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #2196f3;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover { background: #1976d2; scale:105%; box-shadow: red;}
+    .palette {
+      display: flex;
+      gap: 1rem;
+      min-height: 150px;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .color-box {
+      flex: 1;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .color-box:hover { transform: scale(1.05); }
+    .color-code {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+    .export-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .saved-palettes {
+      background: white;
+      height: 10px
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 8px !important;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .hidden { display: none; }
+    #colorPicker {
+      width: 50px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .color-label {
+      text-align: center;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      color: #333;
+    }
+    /* Add this to your existing CSS */
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    
+    main {
+        padding-bottom: 120px; /* Add space equal to footer height + extra */
+    }
+    /* Update existing saved palettes CSS */
+    .saved-palettes {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+    
+    .saved-palette {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background: #f8f8f8;
+        border-radius: 6px;
+    }
+    
+    .saved-palette .color-box {
+        flex: 1;
+        height: 50px;
+        width: 50px;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .saved-palette .color-code {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 0.25rem;
+        text-align: center;
+        font-size: 0.7rem;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .saved-palettes h2 {
+        font-size: 1.1rem;
+        color: #444;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Update your existing footer styles */
+    footer {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-style: oblique;
+        box-shadow: 0 -2px 8px rgba(10, 137, 146, 0.2); /* Shadow at top of footer */
+        border-radius: 20px 20px 0 0;
+        background-color: aquamarine;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: x-large;
+        margin: 0 1rem; /* Add some side margin */
+        width: calc(100% - 2rem); /* Account for side margins */
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Color Palette Generator</h1>
+    <div class="controls">
+      <div class="upload-section">
+        <input type="file" id="imageUpload" accept="image/*" class="hidden">
+        <button id="uploadBtn">Upload Image</button>
+        <button id="generateHarmony">Generate Harmony</button>
+      </div>
+      <div class="color-input">
+        <input type="color" id="colorPicker">
+        <button id="addColor">Add Color</button>
+      </div>
+    </div>
+    <div id="palette" class="palette"></div>
+    <div class="export-controls">
+      <button id="savePalette">Save Palette</button>
+      <select id="exportFormat">
+        <option value="hex">HEX</option>
+        <option value="rgb">RGB</option>
+        <option value="hsl">HSL</option>
+        <option value="css">CSS Variables</option>
+        <option value="scss">SCSS Variables</option>
+      </select>
+      <button id="exportPalette">Export</button>
+    </div>
+    <div id="savedPalettes" class="saved-palettes">
+      <h2>Saved Palettes</h2>
+    </div>
+
+  </main>
+  <footer style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-style: oblique; font-size: large; box-shadow: 0 2px 8px rgba(0,0,0,0.2); border-radius: 20px; background-color: aquamarine; height: 100px; display: flex; align-items: center; justify-content: center; font-size: x-large;">
+    Made by&nbsp;<a href="https://t.me/sardormax" target="_blank" rel="noopener noreferrer">SARDOR</a>&nbsp;with 💻 and ☕
+  </footer>
+  
+  <script>
+    const colorUtils = {
+      rgbToHex: (r, g, b) => '#' + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      }).join(''),
+      hexToRgb: (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      },
+      generateHarmony: (baseColor) => {
+        const rgb = colorUtils.hexToRgb(baseColor);
+        return [
+          baseColor,
+          colorUtils.rgbToHex((rgb.r + 128) % 256, (rgb.g + 128) % 256, (rgb.b + 128) % 256),
+          colorUtils.rgbToHex((rgb.r + 50) % 256, rgb.g, rgb.b),
+          colorUtils.rgbToHex(rgb.r, (rgb.g + 50) % 256, rgb.b),
+          colorUtils.rgbToHex(rgb.r, rgb.g, (rgb.b + 50) % 256)
+        ];
+      }
+    };
+
+    class ColorPaletteGenerator {
+      constructor() {
+        this.colors = [];
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        document.getElementById('uploadBtn').onclick = () => document.getElementById('imageUpload').click();
+        document.getElementById('imageUpload').onchange = (e) => this.handleImageUpload(e);
+        document.getElementById('colorPicker').onchange = (e) => this.handleColorPick(e);
+        document.getElementById('addColor').onclick = () => this.addCurrentColor();
+        document.getElementById('generateHarmony').onclick = () => this.generateHarmony();
+        document.getElementById('savePalette').onclick = () => this.savePalette();
+        document.getElementById('exportPalette').onclick = () => this.exportPalette();
+      }
+
+      handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => this.extractColors(img);
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      extractColors(img) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        
+        const colors = new Set();
+        for(let i = 0; i < 5; i++) {
+          const x = Math.floor(Math.random() * img.width);
+          const y = Math.floor(Math.random() * img.height);
+          const pixel = ctx.getImageData(x, y, 1, 1).data;
+          colors.add(colorUtils.rgbToHex(pixel[0], pixel[1], pixel[2]));
+        }
+        
+        this.colors = Array.from(colors);
+        this.updatePalette();
+      }
+
+      handleColorPick(event) {
+        const color = event.target.value;
+        if (this.colors.length < 5) {
+          this.colors.push(color);
+          this.updatePalette();
+        }
+      }
+
+      addCurrentColor() {
+        const color = document.getElementById('colorPicker').value;
+        if (this.colors.length < 5) {
+          this.colors.push(color);
+          this.updatePalette();
+        }
+      }
+
+      generateHarmony() {
+        const baseColor = document.getElementById('colorPicker').value;
+        this.colors = colorUtils.generateHarmony(baseColor);
+        this.updatePalette();
+      }
+
+      updatePalette() {
+        const palette = document.getElementById('palette');
+        palette.innerHTML = '';
+        const labels = ['Main Text', 'Background', 'Accent', 'Secondary', 'Highlight'];
+        
+        this.colors.forEach((color, index) => {
+          const colorBox = document.createElement('div');
+          colorBox.className = 'color-box';
+          colorBox.style.backgroundColor = color;
+          
+          const colorCode = document.createElement('div');
+          colorCode.className = 'color-code';
+          colorCode.textContent = color.toUpperCase();
+          colorCode.onclick = () => navigator.clipboard.writeText(color);
+          
+          const colorLabel = document.createElement('div');
+          colorLabel.className = 'color-label';
+          colorLabel.textContent = labels[index] || 'Custom';
+          
+          colorBox.appendChild(colorCode);
+          colorBox.appendChild(colorLabel);
+          palette.appendChild(colorBox);
+        });
+      }
+
+      savePalette() {
+        const savedPalettes = JSON.parse(localStorage.getItem('savedPalettes') || '[]');
+        savedPalettes.push(this.colors);
+        localStorage.setItem('savedPalettes', JSON.stringify(savedPalettes));
+        this.updateSavedPalettes();
+      }
+
+      updateSavedPalettes() {
+        const savedPalettes = JSON.parse(localStorage.getItem('savedPalettes') || []);
+        const container = document.getElementById('savedPalettes');
+        container.innerHTML = '<h2>Saved Palettes</h2>';
+        
+        savedPalettes.slice().reverse().forEach(palette => {
+          const paletteDiv = document.createElement('div');
+          paletteDiv.className = 'saved-palette';
+          
+          palette.forEach(color => {
+            const colorBox = document.createElement('div');
+            colorBox.className = 'color-box';
+            colorBox.style.backgroundColor = color;
+            
+            const colorCode = document.createElement('div');
+            colorCode.className = 'color-code';
+            colorCode.textContent = color.toUpperCase();
+            colorCode.onclick = () => navigator.clipboard.writeText(color);
+            
+            colorBox.appendChild(colorCode);
+            paletteDiv.appendChild(colorBox);
+          });
+          
+          container.appendChild(paletteDiv);
+        });
+      }
+
+      exportPalette() {
+        const format = document.getElementById('exportFormat').value;
+        let output = '';
+        
+        switch(format) {
+          case 'hex':
+            output = this.colors.join(', ');
+            break;
+          case 'rgb':
+            output = this.colors.map(color => {
+              const rgb = colorUtils.hexToRgb(color);
+              return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            }).join(', ');
+            break;
+          case 'css':
+            output = this.colors.map((color, i) => 
+              `--color-${i + 1}: ${color};`
+            ).join('\n');
+            break;
+          case 'scss':
+            output = this.colors.map((color, i) =>
+              `$color-${i + 1}: ${color};`
+            ).join('\n');
+            break;
+        }
+        
+        navigator.clipboard.writeText(output);
+        alert('Copied to clipboard!');
+      }
+    }
+
+    new ColorPaletteGenerator();
+  </script>
+</body>
+</html>
